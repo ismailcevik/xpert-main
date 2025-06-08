@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>SCADA Ekranı</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { margin: 0; background-color: #f4f4f4; font-family: sans-serif; }
+        .container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .scada-frame { width: 90%; max-width: 1200px; position: relative; margin-bottom: 20px; }
+        .label { position: absolute; background: rgba(0, 0, 0, 0.6); color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 14px; cursor: pointer; }
+        .label1 { top: 100px; left: 1080px; }
+        .label2 { top: 880px; left: 900px; }
+        svg { width: 100%; height: auto; display: block; }
+        .trend-section { background: #fff; border: 1px solid #ccc; padding: 15px; border-radius: 10px; width: 90%; max-width: 800px; }
+        .selected-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .selected-tag { background-color: #1abc9c; color: white; padding: 4px 8px; border-radius: 5px; font-size: 13px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 95%; max-width: 1200px; position: relative; }
+        .close-btn { position: absolute; top: 10px; right: 20px; font-size: 24px; cursor: pointer; color: #333; }
+    </style>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Expert Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body class="index">
+<div style="
+    background: #f9f9f9;
+    color: #333;
+    padding: 12px 20px;
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+">
+    Hoş geldin, <strong>{{ user }}</strong> |
+    <a href="{{ url_for('logout') }}" style="
+        color: #e74c3c;
+        text-decoration: none;
+        font-weight: 500;
+    " onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+        Çıkış
+    </a>
+</div>
+
+<div class="left-sidebar" id="left-sidebar">
+    <a href="/"><span class="material-icons">home</span>Ana Sayfa</a>
+    <a href="/raporlama"><span class="material-icons">assessment</span>Raporlama</a>
+    <a href="/geneldurum"><span class="material-icons">dashboard</span>Genel Durum</a>
+    <a href="/scada" class="highlighted"><span class="material-icons">dashboard</span>Scada İzleme</a>    
+    <a href="#"><span class="material-icons">settings</span>Ayarlar</a>
+    
+    <div class="submenu">
+        <a href="#"><span class="material-icons">account_circle</span>Profil</a>
+        <a href="#"><span class="material-icons">notifications</span>Alarmlar</a>
+        <a href="#"><span class="material-icons">lock</span>Kilitler</a>
+        <a href="/limitler"><span class="material-icons">tune</span>Limitler</a>
+        <a href="/zamanlar"><span class="material-icons">tune</span>Zamanlar</a>
+    </div>
+
+    <a href="#"><span class="material-icons">money</span>Run Time</a>
+    <a href="#"><span class="material-icons">build</span>Ekipmanlar</a>
+
+    <div class="submenu">
+        <a href="/sistemfan/status"><span class="material-icons">air</span>Sistem Fan Durum</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>ID Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>AP Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>Soğutma Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>Fırın Kafa Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>HGG Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">balance</span>Fırın Tonajı</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">refresh</span>Fırın Devri</a>
+    </div>
+</div>
+
+</head>
+<body>
+<div class="modal" id="trendModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">×</span>
+    <h2>Trend Grafiği</h2>
+    <div id="trendPlot" style="height: 600px;"></div>
+  </div>
+</div>
+<div class="container">
+    <h1>SCADA Gözlem Paneli</h1>
+    <div class="scada-frame">
+        <div class="label label1" data-tag="SISTEM FAN DEVRI">Sistem Fan: {{ data['sistem_fan'] }}%</div>
+        <div class="label label2" data-tag="TORBALI FILTRE GIRIS SICAKLIGI">Torbalı Filtre Giriş Sıcaklığı: {{ data['torbali_filtre_giris_sicakligi'] }} °C</div>
+        {{ svg_content|safe }}
+    </div>
+    <div class="trend-section">
+        <h3>Trend Görüntüle</h3>
+        <p>Etiketlere tıklayarak seçim yapın. Daha sonra <strong>Plot</strong> butonuna tıklayın.</p>
+        <div class="selected-tags" id="selected-tags"></div>
+        <button onclick="plotSelected()">Plot</button>
+    </div>
+</div>
+<script>
+let selectedTags = new Set();
+function updateSelectedTagList() {
+    const tagContainer = document.getElementById('selected-tags');
+    tagContainer.innerHTML = '';
+    selectedTags.forEach(tag => {
+        const tagDiv = document.createElement('div');
+        tagDiv.className = 'selected-tag';
+        tagDiv.textContent = tag;
+        const closeBtn = document.createElement('span');
+        closeBtn.textContent = ' ❌';
+        closeBtn.style.marginLeft = '6px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.onclick = () => {
+            selectedTags.delete(tag);
+            updateSelectedTagList();
+        };
+        tagDiv.appendChild(closeBtn);
+        tagContainer.appendChild(tagDiv);
+    });
+}
+function plotSelected() {
+    if (selectedTags.size === 0) return;
+    fetch('/sistemfantrend/get_data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timeframe: 300 })
+    })
+    .then(res => res.json())
+    .then(allData => {
+        const filteredData = {};
+        selectedTags.forEach(tag => {
+            if (allData[tag]) {
+                filteredData[tag] = allData[tag];
+            }
+        });
+        const traces = Object.entries(filteredData).map(([name, values]) => ({
+            x: Array.from({ length: values.length }, (_, i) => i + 1),
+            y: values,
+            type: 'scatter',
+            name
+        }));
+Plotly.newPlot('trendPlot', traces, {
+    margin: { l: 60, r: 30, t: 50, b: 40 },
+    autosize: true
+}, {
+    displayModeBar: false,
+    responsive: true
+});
+
+        showModal();
+    });
+}
+document.querySelectorAll('.label').forEach(label => {
+    label.addEventListener('click', () => {
+        const tag = label.dataset.tag;
+        if (selectedTags.has(tag)) {
+            selectedTags.delete(tag);
+        } else {
+            selectedTags.add(tag);
+        }
+        updateSelectedTagList();
+    });
+});
+function showModal() {
+    document.getElementById('trendModal').style.display = 'flex';
+}
+function closeModal() {
+    document.getElementById('trendModal').style.display = 'none';
+}
+</script>
+</body>
+</html>

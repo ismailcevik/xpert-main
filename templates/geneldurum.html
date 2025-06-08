@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Expert Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body class="index">
+<div style="
+    background: #f9f9f9;
+    color: #333;
+    padding: 12px 20px;
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+">
+    Hoş geldin, <strong>{{ user }}</strong> |
+    <a href="{{ url_for('logout') }}" style="
+        color: #e74c3c;
+        text-decoration: none;
+        font-weight: 500;
+    " onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+        Çıkış
+    </a>
+</div>
+
+<div class="left-sidebar" id="left-sidebar">
+    <a href="/"><span class="material-icons">home</span>Ana Sayfa</a>
+    <a href="/raporlama"><span class="material-icons">assessment</span>Raporlama</a>
+    <a href="/geneldurum" class="highlighted"><span class="material-icons">dashboard</span>Genel Durum</a>
+    <a href="/scada"><span class="material-icons">dashboard</span>Scada İzleme</a>    
+    <a href="#"><span class="material-icons">settings</span>Ayarlar</a>
+    
+    <div class="submenu">
+        <a href="#"><span class="material-icons">account_circle</span>Profil</a>
+        <a href="#"><span class="material-icons">notifications</span>Alarmlar</a>
+        <a href="#"><span class="material-icons">lock</span>Kilitler</a>
+        <a href="/limitler"><span class="material-icons">tune</span>Limitler</a>
+        <a href="/zamanlar"><span class="material-icons">tune</span>Zamanlar</a>
+    </div>
+
+    <a href="#"><span class="material-icons">money</span>Run Time</a>
+    <a href="#"><span class="material-icons">build</span>Ekipmanlar</a>
+
+    <div class="submenu">
+        <a href="/sistemfan/status"><span class="material-icons">air</span>Sistem Fan Durum</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>ID Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>AP Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>Soğutma Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>Fırın Kafa Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>HGG Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">balance</span>Fırın Tonajı</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">refresh</span>Fırın Devri</a>
+    </div>
+</div>
+
+<div class="content">
+    <h1>Ekipman Expert Durumu</h1>
+    <table class="status-table">
+        <thead>
+            <tr>
+                <th>Ekipman</th>
+                <th>Expert Durumu</th>
+                <th>Gerçek Durum</th>
+                <th>Son 24 Saat</th>
+                <th>Son 30 Gün</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ekipman in ['Sistem Fan', 'ID Fan', 'AP Fan', 'Soğutma Fan', 'Fırın Kafa Kömürü', 'HGG Kömürü', 'Fırın Tonajı', 'Fırın Devri'] %}
+            <tr>
+                <td>{{ ekipman }}</td>
+                <td>
+                    <label class="switch">
+                        <input type="checkbox" class="expert-toggle" data-name="{{ ekipman }}" {% if data.get(ekipman, {}).get('expert') %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </td>
+                <td>{{ 'ON' if data.get(ekipman, {}).get('actual') else 'OFF' }}</td>
+                <td>{{ data.get(ekipman, {}).get('run24', 0) }}%</td>
+                <td>{{ data.get(ekipman, {}).get('run30', 0) }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.querySelectorAll('.expert-toggle').forEach(input => {
+    input.addEventListener('change', () => {
+        const updatedData = {};
+        document.querySelectorAll('.expert-toggle').forEach(i => {
+            const key = i.dataset.name;
+            updatedData[key] = {
+                expert: i.checked
+            };
+        });
+
+        fetch('{{ url_for("geneldurum.panel") }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(updatedData)
+        });
+    });
+});
+</script>
+</body>
+</html>

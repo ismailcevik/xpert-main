@@ -1,0 +1,60 @@
+{
+    "bacaCO": {
+        "altLimit": "10",
+        "ustLimit": "1000",
+        "altHedef": "0",
+        "ustHedef": "750"
+    },
+    "bacaO2": {
+        "altLimit": "5",
+        "ustLimit": "15",
+        "altHedef": "11",
+        "ustHedef": "13"
+    },
+    "firinKafaBasinci": {
+        "altLimit": "-1",
+        "ustLimit": "1",
+        "altHedef": "-0.1",
+        "ustHedef": "-0.01"
+    },
+    "firinKafaSicakligi": {
+        "altLimit": "750",
+        "ustLimit": "1100",
+        "altHedef": "850",
+        "ustHedef": "1000"
+    },
+    "fe": {
+        "altLimit": "51",
+        "ustLimit": "58",
+        "altHedef": "54",
+        "ustHedef": "56"
+    },
+    "loi": {
+        "altLimit": "-5",
+        "ustLimit": "5",
+        "altHedef": "-1",
+        "ustHedef": "2"
+    },
+    "intikalSicakligi": {
+        "altLimit": "500",
+        "ustLimit": "750",
+        "altHedef": "600",
+        "ustHedef": "650"
+    },
+    "torbaliFiltreGirisSicakligi": {
+        "altLimit": "200",
+        "ustLimit": "250",
+        "altHedef": "200",
+        "ustHedef": "230"
+    },
+    "torbaliFiltreGirisBasinci": {
+        "altLimit": "-8",
+        "ustLimit": "0",
+        "altHedef": "-2",
+        "ustHedef": "-0.1"
+    },
+    "fuzzydurum": {
+        "alt": "-5",
+        "ust": "+5"
+    }
+}

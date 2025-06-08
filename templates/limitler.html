@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="index">
+<div style="
+    background: #f9f9f9;
+    color: #333;
+    padding: 12px 20px;
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+">
+    Hoş geldin, <strong>{{ user }}</strong> |
+    <a href="{{ url_for('logout') }}" style="
+        color: #e74c3c;
+        text-decoration: none;
+        font-weight: 500;
+    " onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+        Çıkış
+    </a>
+</div>
+
+<div class="left-sidebar" id="left-sidebar">
+    <a href="/"><span class="material-icons">home</span>Ana Sayfa</a>
+    <a href="/raporlama"><span class="material-icons">assessment</span>Raporlama</a>
+    <a href="/geneldurum"><span class="material-icons">dashboard</span>Genel Durum</a>
+    <a href="/scada"><span class="material-icons">dashboard</span>Scada İzleme</a>    
+    <a href="#"><span class="material-icons">settings</span>Ayarlar</a>
+    
+    <div class="submenu">
+        <a href="#"><span class="material-icons">account_circle</span>Profil</a>
+        <a href="#"><span class="material-icons">notifications</span>Alarmlar</a>
+        <a href="#"><span class="material-icons">lock</span>Kilitler</a>
+        <a href="/limitler" class="highlighted"><span class="material-icons">tune</span>Limitler</a>
+        <a href="/zamanlar"><span class="material-icons">tune</span>Zamanlar</a>
+    </div>
+
+    <a href="#"><span class="material-icons">money</span>Run Time</a>
+    <a href="#"><span class="material-icons">build</span>Ekipmanlar</a>
+
+    <div class="submenu">
+        <a href="/sistemfan/status"><span class="material-icons">air</span>Sistem Fan Durum</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>ID Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>AP Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>Soğutma Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>Fırın Kafa Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>HGG Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">balance</span>Fırın Tonajı</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">refresh</span>Fırın Devri</a>
+    </div>
+</div>
+    <main id="main">
+        <p>Expert Sistemi arayüz menüsüdür. Burada expert ile ilgili genel bilgiler verilmesi planlanmaktadır.</p>
+        BURAYA LOGO GELECEKTİR.
+
+        <div class="form-container">
+            <h1>Limit Ayarlama Sayfası</h1>
+            <form method="POST" action="/limitler">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parametre</th>
+                            <th>Alt Limit</th>
+                            <th>Üst Limit</th>
+                            <th>Alt Hedef</th>
+                            <th>Üst Hedef</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Baca CO</td>
+                            <td><input type="number" name="bacaCOAltLimit" step="any" placeholder="{{ data.get('bacaCO', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="bacaCOUstLimit" step="any" placeholder="{{ data.get('bacaCO', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="bacaCOAltHedef" step="any" placeholder="{{ data.get('bacaCO', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="bacaCOUstHedef" step="any" placeholder="{{ data.get('bacaCO', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Baca O2</td>
+                            <td><input type="number" name="bacaO2AltLimit" step="any" placeholder="{{ data.get('bacaO2', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="bacaO2UstLimit" step="any" placeholder="{{ data.get('bacaO2', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="bacaO2AltHedef" step="any" placeholder="{{ data.get('bacaO2', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="bacaO2UstHedef" step="any" placeholder="{{ data.get('bacaO2', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Fırın Kafa Basıncı</td>
+                            <td><input type="number" name="firinKafaBasinciAltLimit" step="any" placeholder="{{ data.get('firinKafaBasinci', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="firinKafaBasinciUstLimit" step="any" placeholder="{{ data.get('firinKafaBasinci', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="firinKafaBasinciAltHedef" step="any" placeholder="{{ data.get('firinKafaBasinci', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="firinKafaBasinciUstHedef" step="any" placeholder="{{ data.get('firinKafaBasinci', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Fırın Kafa Sıcaklığı</td>
+                            <td><input type="number" name="firinKafaSicakligiAltLimit" step="any" placeholder="{{ data.get('firinKafaSicakligi', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="firinKafaSicakligiUstLimit" step="any" placeholder="{{ data.get('firinKafaSicakligi', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="firinKafaSicakligiAltHedef" step="any" placeholder="{{ data.get('firinKafaSicakligi', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="firinKafaSicakligiUstHedef" step="any" placeholder="{{ data.get('firinKafaSicakligi', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Fe %</td>
+                            <td><input type="number" name="feAltLimit" step="any" placeholder="{{ data.get('fe', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="feUstLimit" step="any" placeholder="{{ data.get('fe', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="feAltHedef" step="any" placeholder="{{ data.get('fe', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="feUstHedef" step="any" placeholder="{{ data.get('fe', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>LOI %</td>
+                            <td><input type="number" name="loiAltLimit" step="any" placeholder="{{ data.get('loi', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="loiUstLimit" step="any" placeholder="{{ data.get('loi', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="loiAltHedef" step="any" placeholder="{{ data.get('loi', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="loiUstHedef" step="any" placeholder="{{ data.get('loi', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>İntikal Sıcaklığı</td>
+                            <td><input type="number" name="intikalSicakligiAltLimit" step="any" placeholder="{{ data.get('intikalSicakligi', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="intikalSicakligiUstLimit" step="any" placeholder="{{ data.get('intikalSicakligi', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="intikalSicakligiAltHedef" step="any" placeholder="{{ data.get('intikalSicakligi', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="intikalSicakligiUstHedef" step="any" placeholder="{{ data.get('intikalSicakligi', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Torbalı Filtre Giriş Sıcaklığı</td>
+                            <td><input type="number" name="torbaliFiltreGirisSicakligiAltLimit" step="any" placeholder="{{ data.get('torbaliFiltreGirisSicakligi', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="torbaliFiltreGirisSicakligiUstLimit" step="any" placeholder="{{ data.get('torbaliFiltreGirisSicakligi', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="torbaliFiltreGirisSicakligiAltHedef" step="any" placeholder="{{ data.get('torbaliFiltreGirisSicakligi', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="torbaliFiltreGirisSicakligiUstHedef" step="any" placeholder="{{ data.get('torbaliFiltreGirisSicakligi', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Torbalı Filtre Giriş Basıncı</td>
+                            <td><input type="number" name="torbaliFiltreGirisBasinciAltLimit" step="any" placeholder="{{ data.get('torbaliFiltreGirisBasinci', {}).get('altLimit', '') }}" required></td>
+                            <td><input type="number" name="torbaliFiltreGirisBasinciUstLimit" step="any" placeholder="{{ data.get('torbaliFiltreGirisBasinci', {}).get('ustLimit', '') }}" required></td>
+                            <td><input type="number" name="torbaliFiltreGirisBasinciAltHedef" step="any" placeholder="{{ data.get('torbaliFiltreGirisBasinci', {}).get('altHedef', '') }}" required></td>
+                            <td><input type="number" name="torbaliFiltreGirisBasinciUstHedef" step="any" placeholder="{{ data.get('torbaliFiltreGirisBasinci', {}).get('ustHedef', '') }}" required></td>
+                        </tr>
+                    </tbody>
+                </table>                              
+                <button type="submit" class="btn-submit">Kaydet</button>
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>

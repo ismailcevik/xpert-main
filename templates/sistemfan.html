@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Fan Durumu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="index">
+<body class="index">
+<div style="
+    background: #f9f9f9;
+    color: #333;
+    padding: 12px 20px;
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+">
+    Hoş geldin, <strong>{{ user }}</strong> |
+    <a href="{{ url_for('logout') }}" style="
+        color: #e74c3c;
+        text-decoration: none;
+        font-weight: 500;
+    " onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+        Çıkış
+    </a>
+</div>
+
+<div class="left-sidebar" id="left-sidebar">
+    <a href="/" class="highlighted"><span class="material-icons">home</span>Ana Sayfa</a>
+    <a href="/raporlama"><span class="material-icons">assessment</span>Raporlama</a>
+    <a href="/geneldurum"><span class="material-icons">dashboard</span>Genel Durum</a>
+    <a href="/scada"><span class="material-icons">dashboard</span>Scada İzleme</a>    
+    <a href="#"><span class="material-icons">settings</span>Ayarlar</a>
+    
+    <div class="submenu">
+        <a href="#"><span class="material-icons">account_circle</span>Profil</a>
+        <a href="#"><span class="material-icons">notifications</span>Alarmlar</a>
+        <a href="#"><span class="material-icons">lock</span>Kilitler</a>
+        <a href="/limitler"><span class="material-icons">tune</span>Limitler</a>
+        <a href="/zamanlar"><span class="material-icons">tune</span>Zamanlar</a>
+    </div>
+
+    <a href="#"><span class="material-icons">money</span>Run Time</a>
+    <a href="#"><span class="material-icons">build</span>Ekipmanlar</a>
+
+    <div class="submenu">
+        <a href="/sistemfan/status" class="highlighted"><span class="material-icons">air</span>Sistem Fan Durum</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>ID Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>AP Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>Soğutma Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>Fırın Kafa Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>HGG Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">balance</span>Fırın Tonajı</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">refresh</span>Fırın Devri</a>
+    </div>
+</div>
+
+<!-- Ana İçerik -->
+<main id="main">
+    <section class="form-container-input">
+        <h1>Sistem Fan Devri Girdiler</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parametre</th><th>Alt Limit</th><th>Üst Limit</th><th>Alt Hedef</th><th>Üst Hedef</th><th>Anlık Veri</th><th>Ortalama Veri</th><th>Durum</th><th>Değişim</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Torbalı Filtre Giriş Sıcaklığı</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisSicakligi']['altLimit'] }}</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisSicakligi']['ustLimit'] }}</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisSicakligi']['altHedef'] }}</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisSicakligi']['ustHedef'] }}</td>
+                    <td id="torbalifiltregirissicakligi_anlikveri">{{ torbalifiltregirissicakligi_anlikveri }}</td>
+                    <td id="torbalifiltregirissicakligi_ortalamaveri">{{ torbalifiltregirissicakligi_ortalamaveri }}</td>
+                    <td id="torbalifiltregirissicakligi_durum">{{ torbalifiltregirissicakligi_durum }}</td>
+                    <td id="torbalifiltregirissicakligi_degisim">{{ torbalifiltregirissicakligi_degisim }}</td>
+                </tr>
+                <tr>
+                    <td>Torbalı Filtre Giriş Basıncı</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisBasinci']['altLimit'] }}</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisBasinci']['ustLimit'] }}</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisBasinci']['altHedef'] }}</td>
+                    <td>{{ sistemfandata['torbaliFiltreGirisBasinci']['ustHedef'] }}</td>
+                    <td id="torbalifiltregirisbasinci_anlikveri">{{ torbalifiltregirisbasinci_anlikveri }}</td>
+                    <td id="torbalifiltregirisbasinci_ortalamaveri">{{ torbalifiltregirisbasinci_ortalamaveri }}</td>
+                    <td id="torbalifiltregirisbasinci_durum">{{ torbalifiltregirisbasinci_durum }}</td>
+                    <td id="torbalifiltregirisbasinci_degisim">{{ torbalifiltregirisbasinci_degisim }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="form-container-output">
+        <h1>Sistem Fan Devri Çıktı</h1>
+        <table>
+            <thead>
+                <tr><th>Parametre</th><th>Mevcut Set Point</th><th>Hedef Set Point</th><th>Aksiyon Zamanı</th><th>Aktiflik</th><th>Manuel Set Point</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Sistem Fan Devri</td>
+                    <td id="sistemfandevri_anlikveri">{{ sistemfandevri_anlikveri }}</td>
+                    <td>2s</td>
+                    <td>3d</td>
+                    <td><input type="checkbox" id="aktiflik" onchange="toggleExpertStatus()"> <span id="expertStatus">#</span></td>
+                    <td><input type="number" name="manuelSetPoint" step="any" placeholder="--"></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+
+   <!-- Trend Grafik Bölümü -->
+<!-- Trend Grafik Bölümü -->
+<section class="card" id="trend-section">
+    <h2>Trend Grafikleri</h2>
+    <div class="trend-inputs">
+        <label for="timeframe_start">Başlangıç Zamanı:</label>
+        <input type="number" id="timeframe_start" value="100" min="1">
+
+        <label for="timeframe_end">Bitiş Zamanı:</label>
+        <input type="number" id="timeframe_end" value="0" min="0">
+
+        <button onclick="getData()">Grafik Göster</button>
+    </div>
+    <div id="chart" style="width: 100%; height: 400px;"></div>
+</section>
+
+
+<!-- Scriptler -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+
+<script>
+    const socket = io('/sistemfan');
+    socket.on('connect', () => {
+        console.log('Bağlandı!');
+        socket.emit('get_data');
+        setInterval(() => socket.emit('get_data'), 5000);
+    });
+
+    socket.on('update_data', (data) => {
+        document.getElementById('sistemfandevri_anlikveri').textContent = data.sistemfandevri_anlikveri;
+        document.getElementById('torbalifiltregirissicakligi_anlikveri').textContent = data.torbalifiltregirissicakligi_anlikveri;
+        document.getElementById('torbalifiltregirisbasinci_anlikveri').textContent = data.torbalifiltregirisbasinci_anlikveri;
+        document.getElementById('torbalifiltregirissicakligi_ortalamaveri').textContent = data.torbalifiltregirissicakligi_ortalamaveri;
+        document.getElementById('torbalifiltregirisbasinci_ortalamaveri').textContent = data.torbalifiltregirisbasinci_ortalamaveri;
+        document.getElementById('torbalifiltregirissicakligi_durum').textContent = data.torbalifiltregirissicakligi_durum;
+        document.getElementById('torbalifiltregirisbasinci_durum').textContent = data.torbalifiltregirisbasinci_durum;
+        document.getElementById('torbalifiltregirissicakligi_degisim').textContent = data.torbalifiltregirissicakligi_degisim;
+        document.getElementById('torbalifiltregirisbasinci_degisim').textContent = data.torbalifiltregirisbasinci_degisim;
+    });
+
+    function getData() {
+        const start = +document.getElementById("timeframe_start").value;
+        const end = +document.getElementById("timeframe_end").value;
+        const timeframe = Math.max(1, start - end);
+
+        fetch('{{ url_for("sistemfantrend.get_data") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ timeframe })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) return alert("Veri alınamadı: " + data.error);
+            const x = Array.from({ length: timeframe }, (_, i) => i + 1);
+            Plotly.newPlot('chart', [
+                { x, y: data["FIRIN TONAJI"], mode: 'lines', name: 'Fırın Tonajı' },
+                { x, y: data["FIRIN DEVRI"], mode: 'lines', name: 'Fırın Devri' },
+                { x, y: data["SISTEM FAN DEVRI"], mode: 'lines', name: 'Sistem Fan Devri' }
+            ], {
+                title: 'Zaman Bazlı Trendler',
+                xaxis: { title: 'Zaman' },
+                yaxis: { title: 'Değer' }
+            });
+        })
+        .catch(err => alert("İstek başarısız oldu: " + err));
+    }
+
+    function toggleExpertStatus() {
+        const status = document.getElementById("expertStatus");
+        const isChecked = document.getElementById("aktiflik").checked;
+        status.textContent = isChecked ? "+" : "-";
+        status.style.color = isChecked ? "green" : "red";
+    }
+</script>
+    
+</body>
+</html>

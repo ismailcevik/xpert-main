@@ -1,0 +1,26 @@
+{
+    "Sistem Fan": {
+        "expert": false
+    },
+    "ID Fan": {
+        "expert": true
+    },
+    "AP Fan": {
+        "expert": true
+    },
+    "So\u011futma Fan": {
+        "expert": true
+    },
+    "F\u0131r\u0131n Kafa K\u00f6m\u00fcr\u00fc": {
+        "expert": true
+    },
+    "HGG K\u00f6m\u00fcr\u00fc": {
+        "expert": true
+    },
+    "F\u0131r\u0131n Tonaj\u0131": {
+        "expert": true
+    },
+    "F\u0131r\u0131n Devri": {
+        "expert": true
+    }
+}

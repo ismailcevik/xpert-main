@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="index">
+<div style="
+    background: #f9f9f9;
+    color: #333;
+    padding: 12px 20px;
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+">
+    Hoş geldin, <strong>{{ user }}</strong> |
+    <a href="{{ url_for('logout') }}" style="
+        color: #e74c3c;
+        text-decoration: none;
+        font-weight: 500;
+    " onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+        Çıkış
+    </a>
+</div>
+
+<div class="left-sidebar" id="left-sidebar">
+    <a href="/" ><span class="material-icons">home</span>Ana Sayfa</a>
+    <a href="/raporlama" class="highlighted"><span class="material-icons">assessment</span>Raporlama</a>
+    <a href="/geneldurum"><span class="material-icons">dashboard</span>Genel Durum</a>
+    <a href="/scada"><span class="material-icons">dashboard</span>Scada İzleme</a>    
+    <a href="#"><span class="material-icons">settings</span>Ayarlar</a>
+    
+    <div class="submenu">
+        <a href="#"><span class="material-icons">account_circle</span>Profil</a>
+        <a href="#"><span class="material-icons">notifications</span>Alarmlar</a>
+        <a href="#"><span class="material-icons">lock</span>Kilitler</a>
+        <a href="/limitler"><span class="material-icons">tune</span>Limitler</a>
+        <a href="/zamanlar"><span class="material-icons">tune</span>Zamanlar</a>
+    </div>
+
+    <a href="#"><span class="material-icons">money</span>Run Time</a>
+    <a href="#"><span class="material-icons">build</span>Ekipmanlar</a>
+
+    <div class="submenu">
+        <a href="/sistemfan/status"><span class="material-icons">air</span>Sistem Fan Durum</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>ID Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>AP Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">air</span>Soğutma Fan</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>Fırın Kafa Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">fireplace</span>HGG Kömürü</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">balance</span>Fırın Tonajı</a>
+    </div>
+    <div class="submenu">
+        <a href="#"><span class="material-icons">refresh</span>Fırın Devri</a>
+    </div>
+</div>
+    <main id="main">
+        <p>Expert Sistemi arayüz menüsüdür. Burada expert ile ilgili genel bilgiler verilmesi planlanmaktadır.</p>
+        BURAYA LOGO GELECEKTİR.
+
+    <h2>Excel'den Sütun Seç</h2>
+    <form method="POST" action="/raporlama/export">
+        {% for col in columns %}
+            <p>{{ col }}</p>  <!-- Sütun adlarını burada da listele -->
+            <label>
+                <input type="checkbox" name="columns" value="{{ col }}">
+                {{ col }}
+            </label><br>
+        {% endfor %}
+        <br>
+        <button type="submit">Seçilenleri Excel Olarak İndir</button>
+    </form>
+    
+</main>
+
+
+</body>
+</html>
