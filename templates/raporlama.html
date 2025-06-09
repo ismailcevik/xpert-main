@@ -14,9 +14,11 @@
       <div class="row">
         <div class="col-md-4">
           <label>Başlangıç Tarih/Saat</label>
-          <input type="datetime-local" name="start_datetime" class="form-control mb-2" required>
+          <input type="datetime-local" name="start_datetime" class="form-control mb-2" required
+                 value="{{ start_dt_str }}">
           <label>Bitiş Tarih/Saat</label>
-          <input type="datetime-local" name="end_datetime" class="form-control mb-2" required>
+          <input type="datetime-local" name="end_datetime" class="form-control mb-2" required
+                 value="{{ end_dt_str }}">
 
           <label>Sütunlar</label><br>
           <button type="button" class="btn btn-sm btn-outline-secondary mb-2" onclick="toggleCols()">Tümünü Seç</button><br>
@@ -29,14 +31,15 @@
           <label>Kriteri Kaydet</label>
           <input type="text" name="criteria_name" placeholder="Kriteria İsmi" class="form-control mb-2">
           <label>Veya Kriter Yükle</label>
-          <select name="load_criteria" class="form-select mb-2">
+          <select name="load_criteria" class="form-select mb-2" onchange="this.form.submit()">
             <option value="">-- Seç --</option>
             {% for name in criteria_list %}
-              <option value="{{name}}">{{name}}</option>
+              <option value="{{name}}" {% if load_name == name %}selected{% endif %}>{{name}}</option>
             {% endfor %}
           </select>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="show_trend" id="show_trend">
+            <input class="form-check-input" type="checkbox" name="show_trend" id="show_trend"
+                   {% if 'show_trend' in request.form %}checked{% endif %}>
             <label class="form-check-label" for="show_trend">Trend Oluştur</label>
           </div>
         </div>
@@ -102,8 +105,8 @@
   <script>
     function toggleCols() {
       const cbs = document.getElementsByName('columns');
-      const allChecked = [...cbs].every(cb=>cb.checked);
-      cbs.forEach(cb=>cb.checked = !allChecked);
+      const allChecked = [...cbs].every(cb => cb.checked);
+      cbs.forEach(cb => cb.checked = !allChecked);
     }
   </script>
 </body>
