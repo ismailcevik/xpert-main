@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<title>Raporlama</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Raporlama</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body class="bg-light p-4">
   <div class="container bg-white p-4 rounded shadow">
     <h3>Raporlama Paneli</h3>
-    <form method="post">
+    <form method="post" action="{{ url_for('raporlama.index') }}">
       <div class="row">
         <div class="col-md-4">
           <label>Başlangıç Tarih/Saat</label>
-          <input type="datetime-local" name="start_datetime" class="form-control mb-2" required
-                 value="{{ start_dt_str }}">
+          <input type="datetime-local" name="start_datetime" class="form-control mb-2" required value="{{ start_dt_str }}">
           <label>Bitiş Tarih/Saat</label>
-          <input type="datetime-local" name="end_datetime" class="form-control mb-2" required
-                 value="{{ end_dt_str }}">
+          <input type="datetime-local" name="end_datetime" class="form-control mb-2" required value="{{ end_dt_str }}">
 
           <label>Sütunlar</label><br>
           <button type="button" class="btn btn-sm btn-outline-secondary mb-2" onclick="toggleCols()">Tümünü Seç</button><br>
@@ -44,8 +42,14 @@
         </div>
 
         <div class="col-md-4 align-self-end">
+          <label>Şablon Seç:</label>
+          <select name="template_name" class="form-select mb-2">
+            <option value="template1.xlsx">Template 1</option>
+            <option value="template2.xlsx">Template 2</option>
+          </select>
+
           <button type="submit" class="btn btn-primary mb-2">Getir</button>
-          <button formaction="/raporlama/export" formmethod="post" class="btn btn-success mb-2">Excel'e Aktar</button>
+          <button formaction="{{ url_for('raporlama.export_excel') }}" formmethod="post" class="btn btn-success mb-2">Excel'e Aktar</button>
         </div>
       </div>
     </form>

@@ -3,13 +3,12 @@ from modules.utils import login_required
 import pandas as pd
 from io import BytesIO
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 import plotly.graph_objs as go
 import plotly.offline as pyo
 import os
 
 bp = Blueprint('raporlama', __name__, url_prefix='/raporlama')
-
 KRITER_DIR = 'kriterler'
 os.makedirs(KRITER_DIR, exist_ok=True)
 
@@ -24,14 +23,11 @@ def index():
 
     criteria_list = [f[:-5] for f in os.listdir(KRITER_DIR) if f.endswith('.json')]
     trend_html = ''
-
-    # Default değerler:
     selected_columns = []
     start_dt = None
     end_dt = None
     data = pd.DataFrame()
     hourly_avg_data = pd.DataFrame()
-
     load_name = request.form.get('load_criteria') if request.method == 'POST' else None
 
     if request.method == 'POST':
@@ -42,7 +38,6 @@ def index():
         load_name = request.form.get('load_criteria')
         show_trend = 'show_trend' in request.form
 
-        # Kriter yükleme varsa
         if load_name:
             crit = json.load(open(f"{KRITER_DIR}/{load_name}.json", encoding='utf-8'))
             selected_columns = crit['columns']
@@ -52,33 +47,25 @@ def index():
             start_dt = pd.to_datetime(start_str) if start_str else None
             end_dt = pd.to_datetime(end_str) if end_str else None
 
-        # Kriter kaydetme
         if name:
             with open(f"{KRITER_DIR}/{name}.json", 'w', encoding='utf-8') as f:
-                json.dump({'columns':selected_columns,
-                           'start':start_dt.isoformat() if start_dt else '',
-                           'end':end_dt.isoformat() if end_dt else ''}, f, ensure_ascii=False)
+                json.dump({'columns': selected_columns,
+                           'start': start_dt.isoformat() if start_dt else '',
+                           'end': end_dt.isoformat() if end_dt else ''}, f, ensure_ascii=False)
             if name not in criteria_list:
                 criteria_list.append(name)
 
         if start_dt and end_dt:
-            # Zaman filtresi
             df = df[(df['RealDate'] >= start_dt) & (df['RealDate'] <= end_dt)]
-
-            # Tarihe göre eskiden yeniye sırala
             df = df.sort_values('RealDate')
-
-            # Seçili sütunlar ve RealDate
             data = df[['RealDate'] + selected_columns]
 
-            # Saatlik ortalama hesaplama (örneğin 08:00-09:00 gibi)
             if not data.empty:
                 df_hourly = df.copy()
-                df_hourly['hour'] = df_hourly['RealDate'].dt.floor('H')  # Saat bazında yuvarla
+                df_hourly['hour'] = df_hourly['RealDate'].dt.floor('H')
                 hourly_avg = df_hourly.groupby('hour')[selected_columns].mean().reset_index()
                 hourly_avg_data = hourly_avg.rename(columns={'hour': 'Saatlik Ortalama'})
 
-            # Trend grafiği: Her sütun için ayrı scatter
             if show_trend and not data.empty:
                 fig = go.Figure()
                 for col in selected_columns:
@@ -89,7 +76,6 @@ def index():
                 fig.update_layout(title='Trend Grafiği', xaxis_title='RealDate', yaxis_title='Değer')
                 trend_html = pyo.plot(fig, output_type='div', include_plotlyjs=False)
 
-    # HTML datetime-local input formatına çevirme
     def to_input_format(dt):
         if not dt:
             return ''
@@ -106,6 +92,7 @@ def index():
                            trend_html=trend_html,
                            start_dt_str=start_dt_str,
                            end_dt_str=end_dt_str,
+                           load_name=load_name,
                            hourly_avg_data=hourly_avg_data.to_dict('records'))
 
 @bp.route('/export', methods=['POST'])
@@ -119,26 +106,38 @@ def export_excel():
     selected_columns = request.form.getlist('columns')
     start_str = request.form.get('start_datetime')
     end_str = request.form.get('end_datetime')
+    template_name = request.form.get('template_name')
 
     start_dt = pd.to_datetime(start_str) if start_str else None
     end_dt = pd.to_datetime(end_str) if end_str else None
 
     if start_dt and end_dt:
         df = df[(df['RealDate'] >= start_dt) & (df['RealDate'] <= end_dt)]
-        df = df.sort_values('RealDate')
-    else:
-        df = df.sort_values('RealDate')
+    df = df.sort_values('RealDate')
 
     if selected_columns:
         df = df[['RealDate'] + selected_columns]
     else:
         df = df[['RealDate']]
 
+    template_path = os.path.join('excel_templates', template_name)
+    if not os.path.exists(template_path):
+        return f"Seçilen template bulunamadı: {template_name}", 400
+
+    from openpyxl import load_workbook
+    from openpyxl.utils.dataframe import dataframe_to_rows
+
+    wb = load_workbook(template_path)
+
+    if 'Sayfa1' in wb.sheetnames:
+        wb.remove(wb['Sayfa1'])
+    sheet = wb.create_sheet('Sayfa1', 0)
+
+    for r in dataframe_to_rows(df, index=False, header=True):
+        sheet.append(r)
+
     output = BytesIO()
-    df.to_excel(output, index=False)
+    wb.save(output)
     output.seek(0)
-
     filename = f"Rapor_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-
     return send_file(output, download_name=filename, as_attachment=True)
-
