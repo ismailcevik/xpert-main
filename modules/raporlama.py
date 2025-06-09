@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, send_file
 from modules.utils import login_required
 import pandas as pd
 from io import BytesIO
@@ -23,15 +23,16 @@ def index():
     columns = [c for c in df.columns if c != 'RealDate']
 
     criteria_list = [f[:-5] for f in os.listdir(KRITER_DIR) if f.endswith('.json')]
-    alarms = []
     trend_html = ''
-    bar_chart_js = ''
 
     # Default değerler:
     selected_columns = []
     start_dt = None
     end_dt = None
     data = pd.DataFrame()
+    hourly_avg_data = pd.DataFrame()
+
+    load_name = request.form.get('load_criteria') if request.method == 'POST' else None
 
     if request.method == 'POST':
         selected_columns = request.form.getlist('columns')
@@ -40,16 +41,14 @@ def index():
         name = request.form.get('criteria_name')
         load_name = request.form.get('load_criteria')
         show_trend = 'show_trend' in request.form
-        show_bar = True
 
         # Kriter yükleme varsa
         if load_name:
             crit = json.load(open(f"{KRITER_DIR}/{load_name}.json", encoding='utf-8'))
             selected_columns = crit['columns']
-            start_dt = pd.to_datetime(crit['start'])
-            end_dt = pd.to_datetime(crit['end'])
+            start_dt = pd.to_datetime(crit['start']) if crit['start'] else None
+            end_dt = pd.to_datetime(crit['end']) if crit['end'] else None
         else:
-            # Kriter yüklenmediyse formdan al
             start_dt = pd.to_datetime(start_str) if start_str else None
             end_dt = pd.to_datetime(end_str) if end_str else None
 
@@ -66,32 +65,29 @@ def index():
             # Zaman filtresi
             df = df[(df['RealDate'] >= start_dt) & (df['RealDate'] <= end_dt)]
 
+            # Tarihe göre eskiden yeniye sırala
+            df = df.sort_values('RealDate')
+
+            # Seçili sütunlar ve RealDate
             data = df[['RealDate'] + selected_columns]
 
-            # Alarm tespiti
-            for col in selected_columns:
-                if pd.api.types.is_numeric_dtype(df[col]):
-                    q1, q3 = df[col].quantile([0.25, 0.75])
-                    iqr = q3 - q1
-                    lim_low, lim_high = q1 - 1.5 * iqr, q3 + 1.5 * iqr
-                    out = df[(df[col] < lim_low) | (df[col] > lim_high)]
-                    for _, row in out.iterrows():
-                        alarms.append({'tarih': row['RealDate'].strftime('%Y-%m-%d %H:%M'),
-                                       'kolon': col, 'deger': row[col]})
+            # Saatlik ortalama hesaplama (örneğin 08:00-09:00 gibi)
+            if not data.empty:
+                df_hourly = df.copy()
+                df_hourly['hour'] = df_hourly['RealDate'].dt.floor('H')  # Saat bazında yuvarla
+                hourly_avg = df_hourly.groupby('hour')[selected_columns].mean().reset_index()
+                hourly_avg_data = hourly_avg.rename(columns={'hour': 'Saatlik Ortalama'})
 
-            # Trend grafiği
+            # Trend grafiği: Her sütun için ayrı scatter
             if show_trend and not data.empty:
-                traces = [go.Scatter(x=data['RealDate'], y=data[c], mode='lines+markers', name=c) for c in selected_columns]
-                fig = go.Figure(traces, layout=go.Layout(title='Trend Grafiği', xaxis_title='RealDate'))
+                fig = go.Figure()
+                for col in selected_columns:
+                    fig.add_trace(go.Scatter(
+                        x=data['RealDate'], y=data[col], mode='lines+markers', name=col,
+                        hovertemplate='%{y}<extra></extra>'
+                    ))
+                fig.update_layout(title='Trend Grafiği', xaxis_title='RealDate', yaxis_title='Değer')
                 trend_html = pyo.plot(fig, output_type='div', include_plotlyjs=False)
-
-            # Günlük ortalama bar grafiği
-            if show_bar and not data.empty:
-                df['date'] = df['RealDate'].dt.date
-                grp = df.groupby('date')[selected_columns].mean().reset_index()
-                labels = [str(d) for d in grp['date']]
-                datasets = [{'label': c, 'data': [round(v, 2) for v in grp[c]]} for c in selected_columns]
-                bar_chart_js = json.dumps({'labels': labels, 'datasets': datasets})
 
     # HTML datetime-local input formatına çevirme
     def to_input_format(dt):
@@ -107,8 +103,42 @@ def index():
                            criteria_list=criteria_list,
                            selected_columns=selected_columns,
                            data=data.to_dict('records'),
-                           alarms=alarms,
                            trend_html=trend_html,
-                           bar_chart_js=bar_chart_js,
                            start_dt_str=start_dt_str,
-                           end_dt_str=end_dt_str)
+                           end_dt_str=end_dt_str,
+                           hourly_avg_data=hourly_avg_data.to_dict('records'))
+
+@bp.route('/export', methods=['POST'])
+@login_required
+def export_excel():
+    df = pd.read_excel('database.xlsx')
+    if 'RealDate' not in df.columns:
+        return "Excel dosyasında 'RealDate' sütunu bulunamadı.", 400
+    df['RealDate'] = pd.to_datetime(df['RealDate'])
+
+    selected_columns = request.form.getlist('columns')
+    start_str = request.form.get('start_datetime')
+    end_str = request.form.get('end_datetime')
+
+    start_dt = pd.to_datetime(start_str) if start_str else None
+    end_dt = pd.to_datetime(end_str) if end_str else None
+
+    if start_dt and end_dt:
+        df = df[(df['RealDate'] >= start_dt) & (df['RealDate'] <= end_dt)]
+        df = df.sort_values('RealDate')
+    else:
+        df = df.sort_values('RealDate')
+
+    if selected_columns:
+        df = df[['RealDate'] + selected_columns]
+    else:
+        df = df[['RealDate']]
+
+    output = BytesIO()
+    df.to_excel(output, index=False)
+    output.seek(0)
+
+    filename = f"Rapor_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+
+    return send_file(output, download_name=filename, as_attachment=True)
+

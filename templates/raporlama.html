@@ -5,7 +5,6 @@
 <title>Raporlama</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-light p-4">
   <div class="container bg-white p-4 rounded shadow">
@@ -29,7 +28,7 @@
 
         <div class="col-md-4">
           <label>Kriteri Kaydet</label>
-          <input type="text" name="criteria_name" placeholder="Kriteria İsmi" class="form-control mb-2">
+          <input type="text" name="criteria_name" placeholder="Kriter İsmi" class="form-control mb-2">
           <label>Veya Kriter Yükle</label>
           <select name="load_criteria" class="form-select mb-2" onchange="this.form.submit()">
             <option value="">-- Seç --</option>
@@ -55,24 +54,26 @@
       <h5>Filtrelenmiş Veriler</h5>
       <div class="table-responsive">
         <table class="table table-striped">
-          <thead class="table-dark"><tr>
-            {% for c in selected_columns %}<th>{{c}}</th>{% endfor %}
-            <th>RealDate</th>
-          </tr></thead><tbody>
-          {% for row in data %}
-            <tr>{% for c in selected_columns %}<td>{{row[c]}}</td>{% endfor %}<td>{{row['RealDate']}}</td></tr>
-          {% endfor %}
-        </tbody></table>
+          <thead class="table-dark">
+            <tr>
+              <th>RealDate</th>
+              {% for c in selected_columns %}
+                <th>{{c}}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data %}
+              <tr>
+                <td>{{ row['RealDate'] }}</td>
+                {% for c in selected_columns %}
+                  <td>{{ row[c] }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-    {% endif %}
-
-    {% if alarms %}
-      <h5 class="text-danger mt-4">Limit Dışı Değerler</h5>
-      <ul class="list-group">
-        {% for a in alarms %}
-          <li class="list-group-item">{{a.tarih}} | {{a.kolon}} = {{a.deger}}</li>
-        {% endfor %}
-      </ul>
     {% endif %}
 
     {% if trend_html %}
@@ -80,25 +81,30 @@
       {{ trend_html|safe }}
     {% endif %}
 
-    {% if bar_chart_js %}
-      <h5 class="mt-4">Günlük Ortalama Grafikler</h5>
-      <canvas id="barChart"></canvas>
-      <script>
-        const bc = {{ bar_chart_js|safe }};
-        const ctx = document.getElementById('barChart').getContext('2d');
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: bc.labels,
-            datasets: bc.datasets.map(ds => ({
-              label: ds.label,
-              data: ds.data,
-              backgroundColor: 'rgba(54, 162, 235, 0.5)'
-            }))
-          },
-          options: { scales:{ y:{ beginAtZero:true } } }
-        });
-      </script>
+    {% if hourly_avg_data %}
+      <h5 class="mt-4">Saatlik Ortalama Veriler</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead class="table-secondary">
+            <tr>
+              <th>Saat</th>
+              {% for c in selected_columns %}
+                <th>{{c}}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in hourly_avg_data %}
+              <tr>
+                <td>{{ row['Saatlik Ortalama'] }}</td>
+                {% for c in selected_columns %}
+                  <td>{{ "%.2f"|format(row[c]) if row[c] is not none else '-' }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% endif %}
   </div>
 
