@@ -1,123 +1,640 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Raporlama</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raporlama Sistemi</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #edf2f7;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .criteria-section {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border: 2px solid #e2e8f0;
+        }
+
+        .export-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0fff4 0%, #f7fafc 100%);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light p-4">
-  <div class="container bg-white p-4 rounded shadow">
-    <h3>Raporlama Paneli</h3>
-    <form method="post" action="{{ url_for('raporlama.index') }}">
-      <div class="row">
-        <div class="col-md-4">
-          <label>Başlangıç Tarih/Saat</label>
-          <input type="datetime-local" name="start_datetime" class="form-control mb-2" required value="{{ start_dt_str }}">
-          <label>Bitiş Tarih/Saat</label>
-          <input type="datetime-local" name="end_datetime" class="form-control mb-2" required value="{{ end_dt_str }}">
-
-          <label>Sütunlar</label><br>
-          <button type="button" class="btn btn-sm btn-outline-secondary mb-2" onclick="toggleCols()">Tümünü Seç</button><br>
-          {% for col in columns %}
-            <input type="checkbox" name="columns" value="{{col}}" {% if col in selected_columns %}checked{% endif %}> {{col}}<br>
-          {% endfor %}
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Raporlama Sistemi</h1>
+            <p>Verilerinizi analiz edin ve raporlarınızı oluşturun</p>
         </div>
 
-        <div class="col-md-4">
-          <label>Kriteri Kaydet</label>
-          <input type="text" name="criteria_name" placeholder="Kriter İsmi" class="form-control mb-2">
-          <label>Veya Kriter Yükle</label>
-          <select name="load_criteria" class="form-select mb-2" onchange="this.form.submit()">
-            <option value="">-- Seç --</option>
-            {% for name in criteria_list %}
-              <option value="{{name}}" {% if load_name == name %}selected{% endif %}>{{name}}</option>
-            {% endfor %}
-          </select>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="show_trend" id="show_trend"
-                   {% if 'show_trend' in request.form %}checked{% endif %}>
-            <label class="form-check-label" for="show_trend">Trend Oluştur</label>
-          </div>
+        <div class="main-content">
+            <!-- Filtre Bölümü -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-filter"></i>
+                    Filtreler ve Ayarlar
+                </h2>
+                
+                <form method="POST" action="/raporlama/" id="mainForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="start_datetime">
+                                <i class="fas fa-calendar-alt"></i> Başlangıç Tarihi
+                            </label>
+                            <input type="datetime-local" id="start_datetime" name="start_datetime" 
+                                   value="{{ start_dt_str }}" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="end_datetime">
+                                <i class="fas fa-calendar-alt"></i> Bitiş Tarihi
+                            </label>
+                            <input type="datetime-local" id="end_datetime" name="end_datetime" 
+                                   value="{{ end_dt_str }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-columns"></i> Sütun Seçimi</label>
+                        <div class="checkbox-grid">
+                            {% for col in columns %}
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="columns" value="{{ col }}" 
+                                       id="col_{{ loop.index }}" 
+                                       {% if col in selected_columns %}checked{% endif %}>
+                                <label for="col_{{ loop.index }}">{{ col }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-search"></i> Sütun Filtreleri</label>
+                        <div class="filter-grid">
+                            {% for col in columns %}
+                            <div class="form-group">
+                                <label for="filter_{{ col }}">{{ col }}</label>
+                                <input type="text" name="filter_{{ col }}" id="filter_{{ col }}"
+                                       value="{{ filters[col] if filters and filters[col] is defined else '' }}" 
+                                       placeholder="Örn: >100, =50, !=30" class="form-control">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Verileri Getir
+                    </button>
+                </form>
+            </div>
+
+            <!-- Kriter Kaydet/Yükle Bölümü -->
+            <div class="section criteria-section">
+                <h2 class="section-title">
+                    <i class="fas fa-save"></i>
+                    Kriter Yönetimi
+                </h2>
+                
+                <div class="form-grid">
+                    <form method="POST" action="/raporlama/" id="saveForm">
+                        <!-- Mevcut form değerlerini gizli alanlar olarak ekle -->
+                        <input type="hidden" name="start_datetime" value="{{ start_dt_str }}">
+                        <input type="hidden" name="end_datetime" value="{{ end_dt_str }}">
+                        {% for col in columns %}
+                        <input type="hidden" name="filter_{{ col }}" value="{{ filters[col] if filters and filters[col] is defined else '' }}">
+                        {% endfor %}
+                        {% for col in selected_columns %}
+                        <input type="hidden" name="columns" value="{{ col }}">
+                        {% endfor %}
+                        
+                        <div class="form-group">
+                            <label for="criteria_name">
+                                <i class="fas fa-tag"></i> Yeni Kriter Adı
+                            </label>
+                            <input type="text" id="criteria_name" name="criteria_name" 
+                                   placeholder="Örn: Günlük Rapor" class="form-control" required>
+                        </div>
+                        <button type="submit" name="save_criteria" value="1" class="btn btn-secondary">
+                            <i class="fas fa-save"></i> Kriteri Kaydet
+                        </button>
+                    </form>
+
+                    <form method="POST" action="/raporlama/">
+                        <div class="form-group">
+                            <label for="load_criteria">
+                                <i class="fas fa-upload"></i> Kayıtlı Kriter Seç
+                            </label>
+                            <select id="load_criteria" name="load_criteria" class="form-control">
+                                <option value="">Kriter Seçiniz</option>
+                                {% for c in criteria_list %}
+                                <option value="{{ c }}" {% if load_name == c %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-outline">
+                            <i class="fas fa-upload"></i> Kriteri Yükle
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if data %}
+            <!-- İstatistikler -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Özet İstatistikler
+                </h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ data|length }}</div>
+                        <div class="stat-label">Toplam Kayıt</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ selected_columns|length }}</div>
+                        <div class="stat-label">Seçili Sütun</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ (filters.values()|list|select|list)|length }}</div>
+                        <div class="stat-label">Aktif Filtre</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Veriler Tablosu -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-table"></i>
+                    Filtrelenmiş Veriler
+                </h2>
+                
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-clock"></i> Tarih</th>
+                                {% for col in selected_columns %}
+                                <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data %}
+                            <tr>
+                                <td>{{ row.RealDate }}</td>
+                                {% for col in selected_columns %}
+                                <td>{{ row[col] }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Export Bölümü -->
+                <div class="export-section">
+                    <form method="POST" action="/raporlama/export" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <input type="hidden" name="start_datetime" value="{{ start_dt_str }}">
+                        <input type="hidden" name="end_datetime" value="{{ end_dt_str }}">
+                        {% for col in selected_columns %}
+                        <input type="hidden" name="columns" value="{{ col }}">
+                        {% endfor %}
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="template_name">Excel Şablonu:</label>
+                            <select id="template_name" name="template_name" class="form-control">
+                                <option value="template.xlsx">Varsayılan Şablon</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-download"></i> Excel İndir
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Trend Grafiği -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Trend Analizi
+                </h2>
+                <div class="chart-container">
+                    {{ trend_html|safe }}
+                </div>
+            </div>
+
+            <!-- Saatlik Ortalama Grafikleri -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Saatlik Ortalama Grafikleri
+                </h2>
+                <div class="charts-container">
+                    {{ hourly_charts_html|safe }}
+                </div>
+            </div>
+
+            <!-- Saatlik Ortalama Tablosu -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-table"></i>
+                    Saatlik Ortalama Tablosu
+                </h2>
+                
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-clock"></i> Saat</th>
+                                {% for col in selected_columns %}
+                                <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in hourly_avg_data %}
+                            <tr>
+                                <td>{{ row.Hour }}</td>
+                                {% for col in selected_columns %}
+                                <td>{{ "%.2f"|format(row[col]) if row[col] is not none else '' }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Veriler yükleniyor...</p>
+            </div>
         </div>
+    </div>
 
-        <div class="col-md-4 align-self-end">
-          <label>Şablon Seç:</label>
-          <select name="template_name" class="form-select mb-2">
-            <option value="template1.xlsx">Template 1</option>
-            <option value="template2.xlsx">Template 2</option>
-          </select>
+    <script>
+        // Form gönderildiğinde loading göster
+        document.getElementById('mainForm').addEventListener('submit', function() {
+            document.getElementById('loading').style.display = 'block';
+        });
 
-          <button type="submit" class="btn btn-primary mb-2">Getir</button>
-          <button formaction="{{ url_for('raporlama.export_excel') }}" formmethod="post" class="btn btn-success mb-2">Excel'e Aktar</button>
-        </div>
-      </div>
-    </form>
+        // Sayfa yüklendiğinde loading gizle
+        window.addEventListener('load', function() {
+            document.getElementById('loading').style.display = 'none';
+        });
 
-    {% if data %}
-      <h5>Filtrelenmiş Veriler</h5>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead class="table-dark">
-            <tr>
-              <th>RealDate</th>
-              {% for c in selected_columns %}
-                <th>{{c}}</th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for row in data %}
-              <tr>
-                <td>{{ row['RealDate'] }}</td>
-                {% for c in selected_columns %}
-                  <td>{{ row[c] }}</td>
-                {% endfor %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% endif %}
+        // Kriter yükleme otomatik form gönderimi
+        document.getElementById('load_criteria').addEventListener('change', function() {
+            if (this.value) {
+                this.form.submit();
+            }
+        });
 
-    {% if trend_html %}
-      <h5 class="mt-4">Trend Grafiği</h5>
-      {{ trend_html|safe }}
-    {% endif %}
+        // Ana formda değişiklik olduğunda kriter kaydetme formunu güncelle
+        function updateSaveForm() {
+            const mainForm = document.getElementById('mainForm');
+            const saveForm = document.getElementById('saveForm');
+            
+            // Tarih alanlarını güncelle
+            const startDateTime = mainForm.querySelector('#start_datetime').value;
+            const endDateTime = mainForm.querySelector('#end_datetime').value;
+            
+            saveForm.querySelector('input[name="start_datetime"]').value = startDateTime;
+            saveForm.querySelector('input[name="end_datetime"]').value = endDateTime;
+            
+            // Mevcut filtreleri temizle ve yenilerini ekle
+            const existingFilters = saveForm.querySelectorAll('input[name^="filter_"]');
+            existingFilters.forEach(input => input.remove());
+            
+            const filterInputs = mainForm.querySelectorAll('input[name^="filter_"]');
+            filterInputs.forEach(input => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = input.name;
+                hiddenInput.value = input.value;
+                saveForm.appendChild(hiddenInput);
+            });
+            
+            // Mevcut sütun seçimlerini temizle ve yenilerini ekle
+            const existingColumns = saveForm.querySelectorAll('input[name="columns"]');
+            existingColumns.forEach(input => input.remove());
+            
+            const checkedColumns = mainForm.querySelectorAll('input[name="columns"]:checked');
+            checkedColumns.forEach(input => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'columns';
+                hiddenInput.value = input.value;
+                saveForm.appendChild(hiddenInput);
+            });
+        }
 
-    {% if hourly_avg_data %}
-      <h5 class="mt-4">Saatlik Ortalama Veriler</h5>
-      <div class="table-responsive">
-        <table class="table table-bordered table-sm">
-          <thead class="table-secondary">
-            <tr>
-              <th>Saat</th>
-              {% for c in selected_columns %}
-                <th>{{c}}</th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for row in hourly_avg_data %}
-              <tr>
-                <td>{{ row['Saatlik Ortalama'] }}</td>
-                {% for c in selected_columns %}
-                  <td>{{ "%.2f"|format(row[c]) if row[c] is not none else '-' }}</td>
-                {% endfor %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% endif %}
-  </div>
+        // Ana formdaki değişiklikleri dinle
+        document.getElementById('mainForm').addEventListener('change', updateSaveForm);
+        document.getElementById('mainForm').addEventListener('input', updateSaveForm);
 
-  <script>
-    function toggleCols() {
-      const cbs = document.getElementsByName('columns');
-      const allChecked = [...cbs].every(cb => cb.checked);
-      cbs.forEach(cb => cb.checked = !allChecked);
-    }
-  </script>
+        // Smooth scroll for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+{
+  "start_datetime": null,
+  "end_datetime": null,
+  "filters": {
+    "FIRIN TONAJI": "",
+    "FIRIN DEVRI": "",
+    "TORBALI FILTRE GIRIS SICAKLIGI": "",
+    "TORBALI FILTRE GIRIS BASINCI": "",
+    "SISTEM FAN DEVRI": "",
+    "SISTEM FAN AMPERI": "",
+    "SISTEM FAN KW": ""
+  },
+  "columns": []
+}
